@@ -1,35 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ClipboardProvider, useClipboard } from './context/ClipboardContext'
+import { RoomEntry } from './components/RoomEntry'
+import { ClipboardView } from './components/ClipboardView'
+import { TooltipProvider } from './components/ui/tooltip'
+import { Toaster } from './components/ui/sonner'
+
+function AppContent() {
+    const { roomCode } = useClipboard()
+
+    return roomCode ? <ClipboardView /> : <RoomEntry />
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <TooltipProvider delayDuration={300}>
+            <ClipboardProvider>
+                <AppContent />
+                <Toaster
+                    theme="dark"
+                    position="bottom-right"
+                    richColors
+                    closeButton
+                />
+            </ClipboardProvider>
+        </TooltipProvider>
+    )
 }
 
 export default App
