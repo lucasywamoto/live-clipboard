@@ -1,5 +1,7 @@
 
 using backend.Data;
+using backend.Hubs;
+using backend.Services;
 using HashidsNet;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +20,13 @@ public class Program
 
         builder.Services.AddSingleton(new Hashids(builder.Configuration["HashSalt:Value"] ?? throw new InvalidOperationException("HashSalt not found in configuration"), 5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
 
+        builder.Services.AddScoped<IRoomService, RoomService>();
+
         var app = builder.Build();
 
         app.UseHttpsRedirection();
+
+        app.MapHub<ClipboardHub>("/clipboardhub");
 
         app.Run();
     }
