@@ -1,7 +1,7 @@
 import * as signalR from '@microsoft/signalr'
 
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl('http://localhost:5134/clipboardhub')
+    .withUrl(import.meta.env.VITE_SIGNALR_URL || '/clipboardhub')
     .withAutomaticReconnect()
     .build()
 
