@@ -15,7 +15,6 @@ import {
     LogOut,
     Clipboard,
     ClipboardList,
-    Hash,
 } from 'lucide-react'
 
 export const ClipboardView = () => {
