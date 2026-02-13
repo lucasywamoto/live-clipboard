@@ -65,15 +65,40 @@ export const ClipboardView = () => {
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
                             <Clipboard className="h-4 w-4 text-primary" />
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
                             <h1 className="text-lg font-semibold leading-none">
                                 Live Clipboard
                             </h1>
-                            <div className="flex items-center gap-1.5 mt-1">
-                                <Hash className="h-3 w-3 text-muted-foreground" />
-                                <span className="font-mono text-sm font-medium text-primary tracking-wider">
+                            <div className="flex items-center ">
+                                <span className="font-mono text-base font-bold px-2 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary tracking-widest select-all">
                                     {roomCode}
                                 </span>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            size="icon-xs"
+                                            variant="ghost"
+                                            className="ml-1 text-primary hover:bg-primary/10"
+                                            onClick={() =>
+                                                handleCopy(
+                                                    roomCode!,
+                                                    'roomCode',
+                                                )
+                                            }
+                                        >
+                                            {copiedId === 'roomCode' ? (
+                                                <Check className="h-3 w-3 text-emerald-500" />
+                                            ) : (
+                                                <Copy className="h-3 w-3" />
+                                            )}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                        {copiedId === 'roomCode'
+                                            ? 'Copied!'
+                                            : 'Copy room code'}
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </div>
                     </div>
@@ -107,42 +132,40 @@ export const ClipboardView = () => {
 
             {/* Main content */}
             <div className="flex-1 overflow-hidden flex flex-col max-w-4xl mx-auto w-full p-4 gap-4">
-                {/* Input area */}
-                <Card className="border-border/50 bg-card/80">
-                    <CardContent className="pt-4 pb-3">
-                        <Textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Type or paste content to share..."
-                            className="min-h-25 resize-none bg-background/50 border-border/50 focus:border-primary/50"
-                        />
-                        <div className="flex justify-between items-center mt-3">
-                            <span className="text-xs text-muted-foreground">
-                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-border/50 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                                    Ctrl
-                                </kbd>
-                                {' + '}
-                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-border/50 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                                    Enter
-                                </kbd>
-                                {' to send'}
-                            </span>
-                            <Button
-                                onClick={handleSend}
-                                disabled={!content.trim()}
-                                size="sm"
-                            >
-                                <Send className="h-3.5 w-3.5" />
-                                Send
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* Input area (no Card wrapper) */}
+                <div className="pt-4 pb-3 bg-transparent">
+                    <Textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type or paste content to share..."
+                        className="min-h-25 resize-none bg-background/50 border-border/50 focus:border-primary/50"
+                    />
+                    <div className="flex justify-between items-center mt-3">
+                        <span className="text-xs text-muted-foreground">
+                            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-border/50 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                                Ctrl
+                            </kbd>
+                            {' + '}
+                            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-border/50 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                                Enter
+                            </kbd>
+                            {' to send'}
+                        </span>
+                        <Button
+                            onClick={handleSend}
+                            disabled={!content.trim()}
+                            size="sm"
+                        >
+                            <Send className="h-3.5 w-3.5" />
+                            Send
+                        </Button>
+                    </div>
+                </div>
 
                 {/* Clipboard history */}
                 <Card className="flex-1 overflow-hidden flex flex-col border-border/50 bg-card/80">
-                    <CardHeader className="pb-3">
+                    <CardHeader>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <ClipboardList className="h-4 w-4 text-muted-foreground" />
@@ -177,57 +200,50 @@ export const ClipboardView = () => {
                             <ScrollArea className="h-full" ref={scrollRef}>
                                 <div className="p-4 space-y-2">
                                     {clipboardItems.map((item) => (
-                                        <div
-                                            key={item.id}
-                                            className="group relative rounded-lg border border-border/40 bg-background/40 p-3 transition-colors hover:border-primary/30 hover:bg-background/60"
-                                        >
-                                            <div className="flex items-start justify-between gap-3">
-                                                <div className="flex-1 min-w-0">
-                                                    <pre className="text-sm whitespace-pre-wrap wrap-break-word font-mono leading-relaxed text-foreground/90">
-                                                        {item.content}
-                                                    </pre>
-                                                    <p className="text-[11px] text-muted-foreground/60 mt-2 font-mono">
-                                                        {new Date(
-                                                            item.timestamp,
-                                                        ).toLocaleTimeString(
-                                                            [],
-                                                            {
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                                second: '2-digit',
-                                                            },
-                                                        )}
-                                                    </p>
-                                                </div>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            onClick={() =>
-                                                                handleCopy(
-                                                                    item.content,
-                                                                    item.id,
-                                                                )
-                                                            }
-                                                            variant="ghost"
-                                                            size="icon-sm"
-                                                            className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
-                                                        >
-                                                            {copiedId ===
-                                                            item.id ? (
-                                                                <Check className="h-3.5 w-3.5 text-emerald-500" />
-                                                            ) : (
-                                                                <Copy className="h-3.5 w-3.5" />
+                                        <Tooltip key={item.id}>
+                                            <TooltipTrigger asChild>
+                                                <div
+                                                    className="relative rounded-lg border border-border/40 bg-background/40 p-3 transition-colors hover:border-primary/30 hover:bg-background/60 flex items-start justify-between gap-3 cursor-pointer"
+                                                    onClick={() =>
+                                                        handleCopy(
+                                                            item.content,
+                                                            item.id,
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="flex-1 min-w-0">
+                                                        <pre className="text-sm whitespace-pre-wrap wrap-break-word font-mono leading-relaxed text-foreground/90">
+                                                            {item.content}
+                                                        </pre>
+                                                        <p className="text-[11px] text-muted-foreground/60 mt-2 font-mono">
+                                                            {new Date(
+                                                                item.timestamp,
+                                                            ).toLocaleTimeString(
+                                                                [],
+                                                                {
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                    second: '2-digit',
+                                                                },
                                                             )}
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="left">
-                                                        {copiedId === item.id
-                                                            ? 'Copied!'
-                                                            : 'Copy to clipboard'}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </div>
-                                        </div>
+                                                        </p>
+                                                    </div>
+                                                    <span className="flex items-center ml-2">
+                                                        {copiedId ===
+                                                        item.id ? (
+                                                            <Check className="h-3.5 w-3.5 text-emerald-500" />
+                                                        ) : (
+                                                            <Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="left">
+                                                {copiedId === item.id
+                                                    ? 'Copied!'
+                                                    : 'Copy to clipboard'}
+                                            </TooltipContent>
+                                        </Tooltip>
                                     ))}
                                 </div>
                             </ScrollArea>
