@@ -22,9 +22,22 @@ public class Program
 
         builder.Services.AddScoped<IRoomService, RoomService>();
 
+        builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("ReactApp", policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    });
+
         var app = builder.Build();
 
         app.UseHttpsRedirection();
+
+        app.UseCors("ReactApp");
 
         app.MapHub<ClipboardHub>("/clipboardhub");
 
