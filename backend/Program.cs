@@ -22,16 +22,19 @@ public class Program
 
         builder.Services.AddScoped<IRoomService, RoomService>();
 
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? ["http://localhost:5173", "http://localhost:3000"];
+
         builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("ReactApp", policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
+            options.AddPolicy("ReactApp", policy =>
+            {
+                policy.WithOrigins(allowedOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
         });
-    });
 
         var app = builder.Build();
 
